@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### Added
+ * Dependency on `crc` to provide slightly faster NDS verification.
+
 ## 0.2.1 - 2023-06-19
 ### Added
  * Prebuilt releases are now provided for Linux, Windows and macOS.

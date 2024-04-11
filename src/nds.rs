@@ -9,9 +9,10 @@ use std::mem;
 use std::path::Path;
 use std::result;
 
+use crc::{Crc, CRC_16_MODBUS};
 use serde::Deserialize;
 
-use crate::crc;
+const CRC: Crc<u16> = Crc::<u16>::new(&CRC_16_MODBUS);
 
 type Result<T> = result::Result<T, Error>;
 
@@ -85,7 +86,7 @@ impl NtrTwlHeader {
         let mut buf = vec![0; mem::size_of::<Self>()];
         f.read_exact(&mut buf)?;
 
-        let crc = crc::checksum(&buf[..0x15e]);
+        let crc = CRC.checksum(&buf[..0x15e]);
         let header: Self = bincode::deserialize(&buf)?;
         if header.header_crc != crc || !header.is_logo_valid() {
             return Err(Error::BadHeader);
@@ -96,7 +97,7 @@ impl NtrTwlHeader {
 
     /// Verifies `self`.
     fn is_logo_valid(&self) -> bool {
-        crc::checksum(&self.nintendo_logo) == 0xcf56
+        CRC.checksum(&self.nintendo_logo) == 0xcf56
     }
 
     /// Checks whether `self` belongs to an NTR-only ROM.
