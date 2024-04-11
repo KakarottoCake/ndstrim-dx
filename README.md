@@ -84,18 +84,15 @@ your system by following the instructions above.
 
 This program is based on an adaptation of the trimming algorithm included in [GodMode9][1].
 
-Additionally, to validate NDS ROMs, it adapts the CRC-16 algorithm included in [TWiLightMenu][2].
-
 -----
 
 ## License
 
-This program is licensed under the terms of the [MIT][3] license.
+This program is licensed under the terms of the [MIT][2] license.
 
-See [LICENSE.txt][4] for further info.
+See [LICENSE.txt][3] for further info.
 
 
 [1]:https://github.com/d0k3/GodMode9
-[2]:https://github.com/DS-Homebrew/TWiLightMenu
-[3]:https://choosealicense.com/licenses/mit/
-[4]:./LICENSE.txt
+[2]:https://choosealicense.com/licenses/mit/
+[3]:./LICENSE.txt
