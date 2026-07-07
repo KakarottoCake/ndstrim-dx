@@ -10,7 +10,7 @@ use std::path::Path;
 use std::result;
 
 use bytemuck::{self, Pod, PodCastError, Zeroable};
-use crc::{Crc, CRC_16_MODBUS};
+use crc::{CRC_16_MODBUS, Crc};
 
 const CRC: Crc<u16> = Crc::<u16>::new(&CRC_16_MODBUS);
 
