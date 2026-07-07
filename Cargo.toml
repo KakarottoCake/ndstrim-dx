@@ -6,7 +6,7 @@ readme = "README.md"
 license = "MIT"
 repository = "https://github.com/Nemris/ndstrim/"
 authors = ["Nemris <nemris@protonmail.com>"]
-description = "An utility to trim NDS ROMs."
+description = "A utility to trim NDS ROMs."
 
 [dependencies]
 bytemuck = { version = "1.25.0", features = ["derive", "min_const_generics"] }
