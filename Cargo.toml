@@ -10,8 +10,8 @@ description = "An utility to trim NDS ROMs."
 
 [dependencies]
 bytemuck = { version = "1.25.0", features = ["derive", "min_const_generics"] }
-clap = { version = "4.3.0", features = ["derive"] }
-crc = "3.2.1"
+clap = { version = "4.6.1", features = ["derive"] }
+crc = "3.4.0"
 
 [profile.release]
 lto = true
