@@ -7,6 +7,7 @@
 ### Changed
  * Replace `bincode` and `serde` with `bytemuck`.
  * Bump dependencies to latest.
+ * Update to Rust's 2024 edition.
 
 ## 0.2.1 - 2023-06-19
 ### Added
