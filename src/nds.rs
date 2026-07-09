@@ -9,9 +9,10 @@ use std::mem;
 use std::path::Path;
 use std::result;
 
-use serde::Deserialize;
+use bytemuck::{self, Pod, PodCastError, Zeroable};
+use crc::{CRC_16_MODBUS, Crc};
 
-use crate::crc;
+const CRC: Crc<u16> = Crc::<u16>::new(&CRC_16_MODBUS);
 
 type Result<T> = result::Result<T, Error>;
 
@@ -21,7 +22,7 @@ pub enum Error {
     /// An error occurred during I/O operations.
     Io(io::Error),
     /// Deserializing binary data failed.
-    Deserialization(bincode::Error),
+    Deserialization(PodCastError),
     /// The header in the NDS file is malformed.
     BadHeader,
     /// The NDS file is already trimmed.
@@ -45,36 +46,32 @@ impl From<io::Error> for Error {
     }
 }
 
-impl From<bincode::Error> for Error {
-    fn from(error: bincode::Error) -> Self {
+impl From<PodCastError> for Error {
+    fn from(error: PodCastError) -> Self {
         Error::Deserialization(error)
     }
 }
 
 /// The header of an NDS file.
-#[derive(Deserialize, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Pod, Zeroable)]
+#[repr(C)]
 struct NtrTwlHeader {
     title: [u8; 12],
     gamecode: [u8; 4],
     makercode: [u8; 2],
     unitcode: u8,
-    #[serde(with = "serde_arrays")]
     ignored0: [u8; 109],
     ntr_rom_size: u32,
     header_size: u32,
-    #[serde(with = "serde_arrays")]
     ignored1: [u8; 56],
-    #[serde(with = "serde_arrays")]
     nintendo_logo: [u8; 156],
     nintendo_logo_crc: u16,
     header_crc: u16,
     ignored2: [u8; 32],
 
     // TWL header half starts here.
-    #[serde(with = "serde_arrays")]
     ignored3: [u8; 144],
     ntr_twl_rom_size: u32,
-    #[serde(with = "serde_arrays")]
     ignored4: [u8; 3564],
 }
 
@@ -85,8 +82,8 @@ impl NtrTwlHeader {
         let mut buf = vec![0; mem::size_of::<Self>()];
         f.read_exact(&mut buf)?;
 
-        let crc = crc::checksum(&buf[..0x15e]);
-        let header: Self = bincode::deserialize(&buf)?;
+        let crc = CRC.checksum(&buf[..0x15e]);
+        let header: Self = *bytemuck::try_from_bytes(&buf)?;
         if header.header_crc != crc || !header.is_logo_valid() {
             return Err(Error::BadHeader);
         }
@@ -96,7 +93,7 @@ impl NtrTwlHeader {
 
     /// Verifies `self`.
     fn is_logo_valid(&self) -> bool {
-        crc::checksum(&self.nintendo_logo) == 0xcf56
+        CRC.checksum(&self.nintendo_logo) == 0xcf56
     }
 
     /// Checks whether `self` belongs to an NTR-only ROM.

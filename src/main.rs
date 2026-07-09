@@ -3,7 +3,6 @@
 #![warn(clippy::pedantic)]
 
 mod cli;
-mod crc;
 mod nds;
 
 use clap::Parser;
