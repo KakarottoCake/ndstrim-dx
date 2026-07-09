@@ -14,5 +14,5 @@ clap = { version = "4.6.1", features = ["derive"] }
 crc = "3.4.0"
 
 [profile.release]
-lto = true
+lto = "thin"
 strip = true
