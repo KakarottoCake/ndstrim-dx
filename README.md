@@ -61,7 +61,7 @@ For a debug build, run:
 cargo b
 ```
 
-For a release build, which produces an optimized and stripped binary with full LTO, run:
+For a release build, which produces an optimized and stripped binary with Thin LTO, run:
 
 ```bash
 cargo b --release
