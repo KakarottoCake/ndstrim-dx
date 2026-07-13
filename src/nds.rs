@@ -12,7 +12,16 @@ use std::result;
 use bytemuck::{self, Pod, PodCastError, Zeroable};
 use crc::{CRC_16_MODBUS, Crc};
 
+/// CRC-16 algorithm in use within headers.
 const CRC: Crc<u16> = Crc::<u16>::new(&CRC_16_MODBUS);
+/// Size of the NTR half of the header.
+const NTR_HEADER_SIZE: usize = 0x15e;
+/// CRC-16 of the Nintendo logo in the header.
+const LOGO_CRC: u16 = 0xcf56;
+/// Size of the RSA cert that enables Download Play.
+const RSA_SIZE: u64 = 0x88;
+/// Magic to determine whether an RSA cert exists. Found after the ROM data.
+const RSA_MAGIC: [u8; 2] = [0x61, 0x63];
 
 type Result<T> = result::Result<T, Error>;
 
@@ -77,13 +86,10 @@ struct NtrTwlHeader {
 
 /// An NDS ROM header.
 impl NtrTwlHeader {
-    /// Loads a header from an open NDS ROM and verifies it.
-    fn from_file(f: &mut File) -> Result<Self> {
-        let mut buf = vec![0; mem::size_of::<Self>()];
-        f.read_exact(&mut buf)?;
-
-        let crc = CRC.checksum(&buf[..0x15e]);
-        let header: Self = *bytemuck::try_from_bytes(&buf)?;
+    /// Loads a header from raw bytes and verifies it.
+    fn from_bytes(bytes: &[u8]) -> Result<Self> {
+        let crc = CRC.checksum(&bytes[..NTR_HEADER_SIZE]);
+        let header: Self = *bytemuck::try_from_bytes(bytes)?;
         if header.header_crc != crc || !header.is_logo_valid() {
             return Err(Error::BadHeader);
         }
@@ -93,7 +99,7 @@ impl NtrTwlHeader {
 
     /// Verifies `self`.
     fn is_logo_valid(&self) -> bool {
-        CRC.checksum(&self.nintendo_logo) == 0xcf56
+        CRC.checksum(&self.nintendo_logo) == LOGO_CRC
     }
 
     /// Checks whether `self` belongs to an NTR-only ROM.
@@ -127,7 +133,11 @@ impl NdsFile {
     /// ```
     pub fn open(path: &Path) -> Result<Self> {
         let mut handle = File::options().read(true).write(true).open(path)?;
-        let header = NtrTwlHeader::from_file(&mut handle)?;
+        let header = {
+            let mut buf = vec![0; mem::size_of::<NtrTwlHeader>()];
+            handle.read_exact(&mut buf)?;
+            NtrTwlHeader::from_bytes(&buf)?
+        };
 
         let file_size = handle.metadata()?.len();
         let trimmed_size = Self::compute_trimmed_size(&mut handle, &header)?;
@@ -146,8 +156,6 @@ impl NdsFile {
     ///
     /// This is only relevant in certain ROMs, e.g. Mario Kart, for Download Play functionality.
     fn has_cert(handle: &mut File, offset: u64) -> io::Result<bool> {
-        const RSA_MAGIC: [u8; 2] = [0x61, 0x63]; // Equals "ac".
-
         let mut buf = vec![0; 2];
         handle.seek(SeekFrom::Start(offset))?;
         handle.read_exact(&mut buf)?;
@@ -161,8 +169,6 @@ impl NdsFile {
     /// certificate.
     /// In such a case, the size should include 0x88 more bytes to preserve Download Play.
     fn compute_trimmed_size(handle: &mut File, header: &NtrTwlHeader) -> Result<u64> {
-        const RSA_SIZE: u64 = 0x88;
-
         if !header.is_ntr_only() {
             return Ok(header.ntr_twl_rom_size.into());
         }
