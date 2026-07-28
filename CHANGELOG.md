@@ -5,7 +5,8 @@
  * Dependency on `crc` to provide slightly faster NDS verification.
  * Provide builds for AARCH64 macOS.
  * `TrimAllNDS.command`, a double-clickable macOS helper that trims every ROM in its directory
-   without requiring a Rust toolchain.
+   without requiring a Rust toolchain. Supports copy, in-place and simulate modes, guards the
+   in-place path behind a confirmation, and writes trimmed copies atomically.
 
 ### Changed
  * Replace `bincode` and `serde` with `bytemuck`.
