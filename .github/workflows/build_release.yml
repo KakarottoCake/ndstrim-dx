@@ -33,5 +33,5 @@ jobs:
           locked: true
           bin: ndstrim
           archive: $bin-$tag-$target
-          include: CHANGELOG.md README.md LICENSE.txt
+          include: CHANGELOG.md README.md LICENSE.txt TrimAllNDS.command
           checksum: sha512
