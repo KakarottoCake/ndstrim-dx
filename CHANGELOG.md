@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+### Added
+ * Dependency on `crc` to provide slightly faster NDS verification.
+ * Provide builds for AARCH64 macOS.
+ * `TrimAllNDS.command`, a double-clickable macOS helper that trims every ROM in its directory
+   without requiring a Rust toolchain.
+
+### Changed
+ * Replace `bincode` and `serde` with `bytemuck`.
+ * Bump dependencies to latest.
+ * Update to Rust's 2024 edition.
+ * Switch to building Windows and macOS flavors natively.
+
 ## 0.2.1 - 2023-06-19
 ### Added
  * Prebuilt releases are now provided for Linux, Windows and macOS.
