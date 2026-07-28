@@ -1,0 +1,37 @@
+name: Build and attach to release
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: Build for ${{ matrix.target }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+            host: ubuntu-latest
+
+          - target: x86_64-pc-windows-msvc
+            host: windows-latest
+
+          - target: x86_64-apple-darwin
+            host: macOS-latest
+
+          - target: aarch64-apple-darwin
+            host: macOS-latest
+
+    runs-on: ${{ matrix.host }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build and upload assets
+        uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          target: ${{ matrix.target }}
+          locked: true
+          bin: ndstrim
+          archive: $bin-$tag-$target
+          include: CHANGELOG.md README.md LICENSE.txt
+          checksum: sha512

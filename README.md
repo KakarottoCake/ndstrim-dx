@@ -1,6 +1,6 @@
 # ndstrim
 
-`ndstrim` is a simple utility to trim the excess padding space from Nintendo DS and DSi ROMs, reducing their file size without affecting gameplay. 
+`ndstrim` is a simple utility to trim the excess padding space from Nintendo DS and DSi ROMs, reducing their file size without affecting gameplay.
 
 It preserves the RSA certificates at the end of NTR-only ROMs to ensure features like **Download Play** continue to work properly.
 
@@ -22,29 +22,92 @@ If you are on macOS (M1/M2/M3 Apple Silicon or Intel), you can trim your files w
 
 If you prefer building and running from the command line:
 
-### Build
-Ensure you have the Rust toolchain installed, then run:
-```bash
-cargo build --release
-```
-The optimized executable will be located in `target/release/ndstrim`.
+### Standard (create a `.trim.nds` copy)
 
-### Commands
-- **Standard (create `.trim.nds` copy)**:
-  ```bash
-  ndstrim game1.nds game2.nds
-  ```
-- **In-place (irreversibly trim original file)**:
-  ```bash
-  ndstrim -i game.nds
-  ```
-- **Simulation (check how much size would be reduced without making changes)**:
-  ```bash
-  ndstrim -s game.nds
-  ```
+```bash
+ndstrim foo.nds bar.nds baz.nds
+```
+
+The original ROMs are left untouched. You can optionally provide a custom extension to use in
+place of `trim.nds` by passing the `-e` flag. Ensure that the extension you provide contains no
+leading dot.
+
+### In-place
+
+If you don't care about preserving the original ROMs, you can run:
+
+```bash
+ndstrim -i foo.nds bar.nds baz.nds
+```
+
+This will trim the files in-place, and **is irreversible**.
+
+### Simulated
+
+If you want to check what `ndstrim` would do — e.g. how much size would be reduced — without
+making any changes, you can use:
+
+```bash
+ndstrim -s foo.nds bar.nds baz.nds
+```
+
+This option can be combined with `-i`.
+
+### Help
+
+Launching `ndstrim` without arguments will display a brief usage message, but you can get a more
+helpful one by passing the `-h` flag.
+
+---
+
+## Building
+
+Building `ndstrim` is a straightforward process that can be done using `cargo`. Ensure you have
+the Rust toolchain installed first.
+
+For a debug build, run:
+
+```bash
+cargo b
+```
+
+For a release build, which produces an optimized and stripped binary with Thin LTO, run:
+
+```bash
+cargo b --release
+```
+
+The resulting executable will be located in `target/release/ndstrim`.
+
+---
+
+## Detection as malware
+
+On Windows, it might happen that Defender quarantines the prebuilt .exe as a malware. Likewise,
+some VirusTotal engines may flag the binary, even if sandbox analysis shows that the file is clean.
+
+This is a false positive, most likely triggered by the use of UPX to minify the binary's size.
+If you don't trust the binary, however, you can always review the source and build `ndstrim` on
+your system by following the instructions above.
+
+---
+
+## Credits
+
+This program is based on an adaptation of the trimming algorithm included in [GodMode9][1].
+
+It is a fork of [Nemris/ndstrim][2], which remains the upstream project.
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
+This program is licensed under the terms of the [MIT][3] license.
+
+See [LICENSE.txt][4] for further info.
+
+
+[1]:https://github.com/d0k3/GodMode9
+[2]:https://github.com/Nemris/ndstrim
+[3]:https://choosealicense.com/licenses/mit/
+[4]:./LICENSE.txt
