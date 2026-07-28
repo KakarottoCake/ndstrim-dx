@@ -8,13 +8,25 @@ It preserves the RSA certificates at the end of NTR-only ROMs to ensure features
 
 ## 🚀 Easy macOS Usage (Double-Click)
 
-If you are on macOS (M1/M2/M3 Apple Silicon or Intel), you can trim your files with a simple double-click:
+If you are on macOS (M1/M2/M3 Apple Silicon or Intel), you can trim your files with a simple
+double-click — no Rust toolchain, no terminal, and nothing to install:
 
 1. Place **[TrimAllNDS.command](TrimAllNDS.command)** in the directory containing your `.nds` files.
 2. Double-click **[TrimAllNDS.command](TrimAllNDS.command)**.
-3. Choose whether you'd like to:
-   - Create trimmed copies (`.trim.nds` files, keeping original files safe)
-   - Trim files in-place (overwrites original files)
+3. Choose what you'd like to do:
+   - **Create trimmed copies** — writes `.trim.nds` files and leaves your originals alone (default)
+   - **Trim in place** — overwrites the originals, and asks you to confirm first because it cannot
+     be undone
+   - **Simulate** — reports how much space you'd save without changing anything
+
+Files that aren't valid ROMs are reported and skipped, never modified. If a run is interrupted,
+no half-written ROM is left behind.
+
+The script can also be pointed at specific files from a terminal:
+
+```bash
+./TrimAllNDS.command foo.nds bar.nds
+```
 
 ---
 
